@@ -103,14 +103,38 @@ function App() {
     const issue = analysisResults.issues_found[issueIndex];
     const parts = issue.split(' → ');
     if (parts.length === 2) {
+      const errorText = parts[0].split(': ')[1] || parts[0];
       const suggestion = parts[1];
+      const category = parts[0].split(': ')[0];
       
-      // For general suggestions, we'll show the suggestion to the user
-      // Since these are general improvements rather than specific text replacements
-      alert(`Suggestion applied!\n\nRecommendation: ${suggestion}\n\nPlease manually review and edit your document based on this suggestion.`);
-      
-      // Mark this suggestion as applied
-      setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+      // For text that can be directly replaced
+      if (editableText.includes(errorText)) {
+        const updatedText = editableText.replace(errorText, `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px;" title="Applied: ${category}">${suggestion}</span>`);
+        setEditableText(updatedText);
+        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+        
+        // Update the DOM directly
+        if (editableParagraphRef.current) {
+          editableParagraphRef.current.innerHTML = updatedText;
+        }
+        
+        // Log the change
+        logChange(category, errorText, suggestion);
+      } else {
+        // For general suggestions, add a highlighted note
+        const noteText = `[${category} Applied: ${suggestion}]`;
+        const updatedText = editableText + `\n\n<span style="background-color: #20b2aa; color: white; padding: 4px 8px; border-radius: 4px; font-style: italic;">${noteText}</span>`;
+        setEditableText(updatedText);
+        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+        
+        // Update the DOM directly
+        if (editableParagraphRef.current) {
+          editableParagraphRef.current.innerHTML = updatedText;
+        }
+        
+        // Log the change
+        logChange(category, "General suggestion", suggestion);
+      }
     }
   };
 

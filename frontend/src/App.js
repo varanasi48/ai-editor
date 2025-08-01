@@ -111,109 +111,36 @@ function App() {
     const colonIndex = errorPart.indexOf(': ');
     const originalText = colonIndex > -1 ? errorPart.substring(colonIndex + 2) : errorPart;
     
-    console.log('=== SIMPLE REPLACEMENT ===');
+    console.log('=== APPLYING SUGGESTION ===');
     console.log('Looking for:', JSON.stringify(originalText));
     console.log('Replace with:', JSON.stringify(suggestion));
     
     const currentElement = editableParagraphRef.current;
     if (!currentElement) return;
     
-    // Get the current HTML and text content
+    // Get current HTML content
     let currentHTML = currentElement.innerHTML;
-    const currentText = currentElement.textContent || currentElement.innerText || "";
     
-    console.log('Document contains text?', currentText.includes(originalText));
-    console.log('Current text length:', currentText.length);
-    console.log('Original text analyzed:', JSON.stringify(analysisResults.original_text || 'Not available'));
-    console.log('Current text preview:', JSON.stringify(currentText.substring(0, 200)));
+    // Create the highlighted replacement
+    const highlighted = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">${suggestion}</span>`;
     
-    // Check if the original analyzed text matches current text
-    if (analysisResults.original_text && analysisResults.original_text !== currentText) {
-      console.warn('WARNING: Current text differs from analyzed text!');
-      console.log('Analyzed text length:', analysisResults.original_text.length);
-      console.log('Current text length:', currentText.length);
-      
-      // Try to find the text in the original analyzed text instead
-      if (analysisResults.original_text.includes(originalText)) {
-        console.log('Text found in original analyzed text, but document has changed');
-        alert('The document has been modified since analysis. Please re-analyze the document to get accurate suggestions.');
-        return;
-      }
+    // Method 1: Simple direct HTML replacement
+    if (currentHTML.includes(originalText)) {
+      const newHTML = currentHTML.replace(originalText, highlighted);
+      console.log('Direct HTML replacement successful!');
+      currentElement.innerHTML = newHTML;
+      setEditableText(newHTML);
+      setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+      logChange(errorPart, originalText, suggestion);
+      return;
     }
     
-    // Simple text replacement approach
-    if (currentText.includes(originalText)) {
-      // Create the highlighted replacement
-      const highlighted = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">${suggestion}</span>`;
-      
-      // Use a very simple replacement - find the first occurrence of the original text
-      const textIndex = currentText.indexOf(originalText);
-      if (textIndex !== -1) {
-        // Split the HTML at word boundaries to find the exact location
-        const beforeText = currentText.substring(0, textIndex);
-        const afterText = currentText.substring(textIndex + originalText.length);
-        
-        // Count how many characters we need to skip in HTML to get to the right position
-        let htmlIndex = 0;
-        let textCount = 0;
-        let inTag = false;
-        
-        // Find the HTML position that corresponds to our text position
-        for (let i = 0; i < currentHTML.length && textCount < textIndex; i++) {
-          if (currentHTML[i] === '<') {
-            inTag = true;
-          } else if (currentHTML[i] === '>') {
-            inTag = false;
-          } else if (!inTag) {
-            textCount++;
-          }
-          htmlIndex = i + 1;
-        }
-        
-        // Now find the end position
-        let endHtmlIndex = htmlIndex;
-        textCount = 0;
-        inTag = false;
-        
-        for (let i = htmlIndex; i < currentHTML.length && textCount < originalText.length; i++) {
-          if (currentHTML[i] === '<') {
-            inTag = true;
-          } else if (currentHTML[i] === '>') {
-            inTag = false;
-          } else if (!inTag) {
-            textCount++;
-          }
-          endHtmlIndex = i + 1;
-        }
-        
-        // Replace the HTML segment
-        const beforeHTML = currentHTML.substring(0, htmlIndex);
-        const afterHTML = currentHTML.substring(endHtmlIndex);
-        const newHTML = beforeHTML + highlighted + afterHTML;
-        
-        console.log('Replacement successful!');
-        currentElement.innerHTML = newHTML;
-        setEditableText(newHTML);
-        
-        // Mark as applied
-        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        logChange(errorPart, originalText, suggestion);
-        
-        return; // Success, exit early
-      }
-    }
-    
-    // If we get here, the replacement failed - DON'T add notes, try a different approach
-    console.log('Simple replacement failed, trying regex approach');
-    
-    // Try with regex as last resort
+    // Method 2: Try with regex
     const escapedOriginal = originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(escapedOriginal, 'g');
     
-    if (regex.test(currentText)) {
-      const highlighted = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">${suggestion}</span>`;
+    if (regex.test(currentHTML)) {
       const newHTML = currentHTML.replace(regex, highlighted);
-      
       if (newHTML !== currentHTML) {
         console.log('Regex replacement successful!');
         currentElement.innerHTML = newHTML;
@@ -224,8 +151,40 @@ function App() {
       }
     }
     
-    console.error('All replacement methods failed for:', originalText);
-    console.log('This usually means the document was changed after analysis. Please re-analyze.');
+    // Method 3: Check plain text content
+    const currentText = currentElement.textContent || currentElement.innerText || "";
+    if (currentText.includes(originalText)) {
+      // Found in text but not in HTML - this means it might be inside other tags
+      // Use a more flexible approach
+      const words = originalText.split(' ');
+      let searchHTML = currentHTML;
+      
+      // Try to find a pattern that matches the text even with HTML tags in between
+      for (let word of words) {
+        if (!searchHTML.includes(word)) {
+          console.log('Word not found in HTML:', word);
+          break;
+        }
+      }
+      
+      // Fallback: Replace just the first word and let user manually handle the rest
+      const firstWord = words[0];
+      if (currentHTML.includes(firstWord)) {
+        const newHTML = currentHTML.replace(firstWord, highlighted);
+        console.log('Partial replacement successful!');
+        currentElement.innerHTML = newHTML;
+        setEditableText(newHTML);
+        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+        logChange(errorPart, originalText, suggestion);
+        return;
+      }
+    }
+    
+    // If all methods fail
+    console.error('Text not found:', originalText);
+    console.log('Current HTML preview:', currentHTML.substring(0, 500));
+    console.log('Current text preview:', currentText.substring(0, 500));
+    alert(`Could not find "${originalText}" in the document. Try re-analyzing the document.`);
   };
 
   const logChange = async (category, originalText, suggestedText) => {

@@ -478,3 +478,27 @@ CATEGORY: Style: In India we have RBI.
 ORIGINAL: "In India we have RBI."
 SUGGESTED: "In India, the Reserve Bank of India (RBI) oversees"
 ==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T19:45:03.002Z
+DOCUMENT: 1. Dedication.docx
+CATEGORY: Legal terminology: Shri
+ORIGINAL: "Shri"
+SUGGESTED: "Mr."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T19:45:04.650Z
+DOCUMENT: 1. Dedication.docx
+CATEGORY: Capitalization: the prime minister of India and father of New India
+ORIGINAL: "the prime minister of India and father of New India"
+SUGGESTED: "the Prime Minister of India and Father of New India"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T19:45:06.070Z
+DOCUMENT: 1. Dedication.docx
+CATEGORY: Style: I would like to
+ORIGINAL: "I would like to"
+SUGGESTED: "This book is dedicated to"
+==========================================

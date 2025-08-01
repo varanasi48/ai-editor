@@ -5,6 +5,9 @@ function App() {
   // Use environment variable for API URL
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
   
+  // Version for cache busting
+  const APP_VERSION = "v2.1.0-" + Date.now();
+  
   const [pdfText, setPdfText] = useState("Upload a PDF or DOCX file to see its content here.");
   const [analysisResults, setAnalysisResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -248,7 +251,15 @@ function App() {
           fontWeight: 'bold',
           color: '#333'
         }}>
-          � AI Editor
+          🤖 AI Editor
+          <span style={{
+            fontSize: '12px',
+            color: '#6c757d',
+            fontWeight: 'normal',
+            marginLeft: '10px'
+          }}>
+            {APP_VERSION}
+          </span>
         </h1>
         <button 
           onClick={handleViewLog}

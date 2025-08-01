@@ -175,37 +175,26 @@ class FastAPIWSGIAdapter:
         client = Mistral(api_key=api_key)
         
         # Craft a specific prompt for grammar and spelling checking
-        prompt = f"""You are a professional editor and grammar checker. Analyze the following text for:
-1. Grammar mistakes
-2. Spelling errors  
-3. Punctuation issues
-4. Style improvements
-5. Word choice improvements
-6. Professional language suggestions
+        prompt = f"""Analyze this text for errors and provide ONLY specific corrections:
 
-Text to analyze:
 "{text}"
 
-Please provide specific corrections in this EXACT format:
-CORRECTION: [exact text to replace] → [corrected text]
-EXPLANATION: [brief explanation why]
-TYPE: [grammar/spelling/style/punctuation]
+Respond with corrections in this format only:
+CORRECTION: [wrong text] → [correct text]
+TYPE: [grammar/spelling/style]
 
-For example:
+Examples:
 CORRECTION: much talented → many talented
-EXPLANATION: "Much" is used with uncountable nouns, "many" with countable nouns like people
 TYPE: grammar
-
-CORRECTION: alot → a lot
-EXPLANATION: "A lot" should be written as two words
+CORRECTION: alot → a lot  
 TYPE: spelling
 
-Find ALL issues in the text and provide specific, actionable corrections."""
+Be concise. List only clear errors."""
 
         try:
-            # Call Mistral API
+            # Call Mistral API with timeout handling
             response = client.chat.complete(
-                model="mistral-large-latest",
+                model="mistral-small-latest",  # Use faster model
                 messages=[
                     {
                         "role": "user", 
@@ -213,7 +202,7 @@ Find ALL issues in the text and provide specific, actionable corrections."""
                     }
                 ],
                 temperature=0.1,  # Low temperature for consistent corrections
-                max_tokens=1500
+                max_tokens=800   # Reduced tokens for faster response
             )
             
             ai_response = response.choices[0].message.content
@@ -261,13 +250,24 @@ Find ALL issues in the text and provide specific, actionable corrections."""
                         'suggestion': parts[1].strip()
                     }
                 
-            elif line.startswith('EXPLANATION:'):
-                current_correction['explanation'] = line.replace('EXPLANATION:', '').strip()
-                
-            elif line.startswith('TYPE:'):
-                current_correction['type'] = line.replace('TYPE:', '').strip()
-        
-        # Add final correction
+                elif line.startswith('EXPLANATION:'):
+                    current_correction['explanation'] = line.replace('EXPLANATION:', '').strip()
+                    
+                elif line.startswith('TYPE:'):
+                    current_correction['type'] = line.replace('TYPE:', '').strip()
+                    
+                    # When we hit TYPE, we have a complete correction, add it immediately
+                    if current_correction.get('original') and current_correction.get('suggestion'):
+                        suggestions.append({
+                            "id": suggestion_id,
+                            "type": current_correction.get('type', 'improvement'),
+                            "original": current_correction['original'],
+                            "suggestion": current_correction['suggestion'],
+                            "explanation": current_correction.get('explanation', 'AI suggested improvement'),
+                            "confidence": 0.9
+                        })
+                        suggestion_id += 1
+                        current_correction = {}  # Reset for next correction        # Add final correction
         if current_correction.get('original') and current_correction.get('suggestion'):
             suggestions.append({
                 "id": suggestion_id,

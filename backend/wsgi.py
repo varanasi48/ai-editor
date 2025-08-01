@@ -120,6 +120,12 @@ class FastAPIWSGIAdapter:
             try:
                 suggestions = self.analyze_with_mistral(text)
                 print(f"Mistral analysis successful: {len(suggestions)} suggestions")
+                
+                # If Mistral returns no suggestions, use basic analysis as backup
+                if not suggestions:
+                    print("Mistral returned no suggestions, using basic analysis")
+                    suggestions = self.create_basic_analysis(text)
+                    
             except Exception as ai_error:
                 print(f"Mistral AI error: {ai_error}, falling back to basic analysis")
                 suggestions = self.create_basic_analysis(text)
@@ -193,6 +199,9 @@ Be concise. List only clear errors."""
 
         try:
             # Call Mistral API with timeout handling
+            import time
+            start_time = time.time()
+            
             response = client.chat.complete(
                 model="mistral-small-latest",  # Use faster model
                 messages=[
@@ -202,8 +211,11 @@ Be concise. List only clear errors."""
                     }
                 ],
                 temperature=0.1,  # Low temperature for consistent corrections
-                max_tokens=800   # Reduced tokens for faster response
+                max_tokens=300   # Reduced tokens for faster response
             )
+            
+            elapsed_time = time.time() - start_time
+            print(f"Mistral API call took {elapsed_time:.2f} seconds")
             
             ai_response = response.choices[0].message.content
             print(f"Mistral AI response: {ai_response}")

@@ -113,39 +113,30 @@ function App() {
       console.log('Trying to replace:', originalText, 'with:', suggestion);
       
       // Get current text from the editable element (use textContent for plain text matching)
-      const currentText = editableParagraphRef.current ? editableParagraphRef.current.textContent || editableParagraphRef.current.innerText : editableText;
-      const currentHTML = editableParagraphRef.current ? editableParagraphRef.current.innerHTML : editableText;
+      const currentElement = editableParagraphRef.current;
+      if (!currentElement) return;
+      
+      const currentText = currentElement.textContent || currentElement.innerText || "";
+      const currentHTML = currentElement.innerHTML || "";
       
       console.log('Current text contains original?', currentText.includes(originalText));
+      console.log('Original text length:', originalText.length);
+      console.log('Current text length:', currentText.length);
+      console.log('Original text:', JSON.stringify(originalText));
+      console.log('Current text sample:', JSON.stringify(currentText.substring(0, 100)));
       
-      // Replace the original text with highlighted suggestion
+      // Try exact match first
       if (currentText.includes(originalText)) {
         const highlightedSuggestion = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;" title="Applied: ${originalText} → ${suggestion}">${suggestion}</span>`;
-        
-        // Create a temporary div to work with the HTML properly
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = currentHTML;
-        
-        // Replace in the text content
-        const textContent = tempDiv.textContent || tempDiv.innerText;
-        const updatedTextContent = textContent.replace(originalText, suggestion);
-        
-        // Now replace in the HTML structure
         const regex = new RegExp(originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
         const updatedHTML = currentHTML.replace(regex, highlightedSuggestion);
         
-        // Update both state and DOM
+        currentElement.innerHTML = updatedHTML;
         setEditableText(updatedHTML);
-        if (editableParagraphRef.current) {
-          editableParagraphRef.current.innerHTML = updatedHTML;
-        }
         
         // Mark as applied
         setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        
-        // Log the change
         logChange(errorPart, originalText, suggestion);
-        
         console.log('Applied suggestion successfully');
       } else {
         console.log('Text not found, adding as note');
@@ -153,11 +144,8 @@ function App() {
         const noteText = `✓ Applied: ${suggestion}`;
         const updatedHTML = currentHTML + `<br><span style="background-color: #20b2aa; color: white; padding: 4px 8px; border-radius: 4px; font-style: italic; display: inline-block; margin: 4px 0;">${noteText}</span>`;
         
+        currentElement.innerHTML = updatedHTML;
         setEditableText(updatedHTML);
-        if (editableParagraphRef.current) {
-          editableParagraphRef.current.innerHTML = updatedHTML;
-        }
-        
         setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
         logChange("Note", "general", suggestion);
       }

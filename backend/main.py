@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import re
 from pdf_utils import extract_text_from_pdf
-from docx_utils import extract_text_from_docx
+try:
+    from docx_utils import extract_text_from_docx
+    DOCX_SUPPORT = True
+except ImportError:
+    DOCX_SUPPORT = False
+    def extract_text_from_docx(file_path):
+        return "DOCX processing is temporarily unavailable. Please use PDF format."
 import tempfile
 import os
 from mistralai import Mistral
@@ -34,6 +40,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+async def root():
+    return {"message": "AI Legal Document Editor API", "status": "running", "version": "1.0.0"}
 
 class AnalyzeRequest(BaseModel):
     text: str
@@ -471,7 +481,10 @@ async def upload_document(file: UploadFile = File(...)):
         if is_pdf:
             extracted_text = extract_text_from_pdf(temp_file_path)
         else:
-            extracted_text = extract_text_from_docx(temp_file_path)
+            if DOCX_SUPPORT:
+                extracted_text = extract_text_from_docx(temp_file_path)
+            else:
+                extracted_text = "DOCX processing is temporarily unavailable. Please upload a PDF file instead."
         
         # Clean up the temporary file
         os.unlink(temp_file_path)
@@ -498,3 +511,5 @@ async def upload_document(file: UploadFile = File(...)):
             except:
                 pass
         raise HTTPException(status_code=500, detail=f"Error processing document: {str(e)}")
+
+# For Zappa deployment - the app instance is used directly

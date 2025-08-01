@@ -1,0 +1,38 @@
+AI Editor - Deployment URLs and Information
+=============================================
+
+Frontend (AWS Amplify):
+- Live URL: https://main.d1f88271vq3aga.amplifyapp.com/
+- Status: ✅ DEPLOYED
+- Deployment Date: August 1, 2025
+- Repository: https://github.com/varanasi48/ai-editor
+- Branch: main
+
+Backend (AWS Lambda via Zappa):
+- Platform: AWS Lambda + API Gateway
+- Status: ✅ DEPLOYED
+- API URL: https://yzmbcka71j.execute-api.ap-south-1.amazonaws.com/dev
+- Project Name: backend-ai
+- Region: ap-south-1
+
+Current Features:
+- ✅ Clean, professional AI Editor interface
+- ✅ File upload UI (PDF/DOCX)
+- ✅ Document editing area
+- ✅ Suggestions panel with teal-colored applied suggestions
+- ✅ Logging system UI
+- ✅ Responsive design
+- ✅ FastAPI backend deployed on AWS Lambda
+- ⚠️ DOCX support temporarily disabled (PDF only)
+
+Next Steps:
+1. ✅ Backend deployed successfully
+2. 🔄 Update frontend environment variable with backend API URL
+3. 🔄 Test end-to-end functionality
+4. 🔄 Configure Mistral API key for AI features
+
+Notes:
+- Backend is deployed and running on AWS Lambda
+- Frontend needs API URL update for full functionality
+- Mangum adapter configuration may need adjustment for optimal performance
+- AI features require Mistral API key configuration

@@ -251,7 +251,7 @@ function App() {
           fontWeight: 'bold',
           color: '#333'
         }}>
-          🤖 AI Editor
+          🤖 ZU-edits
           <span style={{
             fontSize: '12px',
             color: '#6c757d',

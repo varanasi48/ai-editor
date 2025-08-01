@@ -62,8 +62,8 @@ function App() {
   };
 
   const handleAnalyze = async () => {
-    if (!pdfText || pdfText === "Upload a PDF or DOCX file to see its content here.") {
-      alert("Please upload a document first.");
+    if (!editableText || editableText === "Upload a PDF or DOCX file to see its content here.") {
+      alert("Please enter or upload some text to analyze.");
       return;
     }
 
@@ -74,7 +74,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: pdfText }),
+        body: JSON.stringify({ text: editableText }),
       });
       
       if (!response.ok) {

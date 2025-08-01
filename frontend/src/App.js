@@ -112,8 +112,8 @@ function App() {
     const originalText = colonIndex > -1 ? errorPart.substring(colonIndex + 2) : errorPart;
     
     console.log('=== SIMPLE REPLACEMENT ===');
-    console.log('Looking for:', originalText);
-    console.log('Replace with:', suggestion);
+    console.log('Looking for:', JSON.stringify(originalText));
+    console.log('Replace with:', JSON.stringify(suggestion));
     
     const currentElement = editableParagraphRef.current;
     if (!currentElement) return;
@@ -123,7 +123,23 @@ function App() {
     const currentText = currentElement.textContent || currentElement.innerText || "";
     
     console.log('Document contains text?', currentText.includes(originalText));
-    console.log('Current text preview:', currentText.substring(0, 200));
+    console.log('Current text length:', currentText.length);
+    console.log('Original text analyzed:', JSON.stringify(analysisResults.original_text || 'Not available'));
+    console.log('Current text preview:', JSON.stringify(currentText.substring(0, 200)));
+    
+    // Check if the original analyzed text matches current text
+    if (analysisResults.original_text && analysisResults.original_text !== currentText) {
+      console.warn('WARNING: Current text differs from analyzed text!');
+      console.log('Analyzed text length:', analysisResults.original_text.length);
+      console.log('Current text length:', currentText.length);
+      
+      // Try to find the text in the original analyzed text instead
+      if (analysisResults.original_text.includes(originalText)) {
+        console.log('Text found in original analyzed text, but document has changed');
+        alert('The document has been modified since analysis. Please re-analyze the document to get accurate suggestions.');
+        return;
+      }
+    }
     
     // Simple text replacement approach
     if (currentText.includes(originalText)) {
@@ -209,6 +225,7 @@ function App() {
     }
     
     console.error('All replacement methods failed for:', originalText);
+    console.log('This usually means the document was changed after analysis. Please re-analyze.');
   };
 
   const logChange = async (category, originalText, suggestedText) => {

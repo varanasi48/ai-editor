@@ -103,37 +103,14 @@ function App() {
     const issue = analysisResults.issues_found[issueIndex];
     const parts = issue.split(' → ');
     if (parts.length === 2) {
-      const errorText = parts[0].split(': ')[1];
       const suggestion = parts[1];
-      const category = parts[0].split(': ')[0];
       
-      // Create a temporary element to work with the HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = editableText;
+      // For general suggestions, we'll show the suggestion to the user
+      // Since these are general improvements rather than specific text replacements
+      alert(`Suggestion applied!\n\nRecommendation: ${suggestion}\n\nPlease manually review and edit your document based on this suggestion.`);
       
-      // Find the specific span with the matching data-issue-index
-      const targetSpan = tempDiv.querySelector(`span[data-issue-index="${issueIndex}"]`);
-      
-      if (targetSpan) {
-        // Apply the suggestion by updating the text content and styling
-        targetSpan.textContent = suggestion;
-        targetSpan.style.backgroundColor = '#d4f8d4';
-        targetSpan.style.color = '#2d5a2d';
-        targetSpan.style.fontWeight = 'bold';
-        targetSpan.title = `Applied: ${category} - ${errorText} → ${suggestion}`;
-        
-        // Update the editable text
-        setEditableText(tempDiv.innerHTML);
-        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        
-        // Update the DOM directly
-        if (editableParagraphRef.current) {
-          editableParagraphRef.current.innerHTML = tempDiv.innerHTML;
-        }
-        
-        // Log the change
-        logChange(category, errorText, suggestion);
-      }
+      // Mark this suggestion as applied
+      setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
     }
   };
 

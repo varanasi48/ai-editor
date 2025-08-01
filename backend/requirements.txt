@@ -4,4 +4,4 @@ python-multipart
 PyMuPDF
 python-dotenv
 mistralai
-mangum
+werkzeug

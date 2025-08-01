@@ -1,10 +1,10 @@
 {
     "dev": {
-        "app_function": "wsgi.handler",
+        "app_function": "wsgi.application",
         "aws_region": "ap-south-1",
         "exclude": [
             "boto3",
-            "dateutil",
+            "dateutil", 
             "botocore",
             "s3transfer",
             "concurrent"

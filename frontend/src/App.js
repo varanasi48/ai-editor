@@ -103,37 +103,44 @@ function App() {
     const issue = analysisResults.issues_found[issueIndex];
     const parts = issue.split(' → ');
     if (parts.length === 2) {
-      const errorText = parts[0].split(': ')[1] || parts[0];
+      const errorPart = parts[0];
       const suggestion = parts[1];
-      const category = parts[0].split(': ')[0];
       
-      // For text that can be directly replaced
-      if (editableText.includes(errorText)) {
-        const updatedText = editableText.replace(errorText, `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px;" title="Applied: ${category}">${suggestion}</span>`);
-        setEditableText(updatedText);
-        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+      // Extract the actual text to replace (after the category prefix)
+      const colonIndex = errorPart.indexOf(': ');
+      const originalText = colonIndex > -1 ? errorPart.substring(colonIndex + 2) : errorPart;
+      
+      // Get current text from the editable element
+      const currentText = editableParagraphRef.current ? editableParagraphRef.current.innerHTML : editableText;
+      
+      // Replace the original text with highlighted suggestion
+      if (currentText.includes(originalText)) {
+        const highlightedSuggestion = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;" title="Applied: ${errorPart}">${suggestion}</span>`;
+        const updatedText = currentText.replace(new RegExp(originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), highlightedSuggestion);
         
-        // Update the DOM directly
+        // Update both state and DOM
+        setEditableText(updatedText);
         if (editableParagraphRef.current) {
           editableParagraphRef.current.innerHTML = updatedText;
         }
         
+        // Mark as applied
+        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+        
         // Log the change
-        logChange(category, errorText, suggestion);
+        logChange(errorPart, originalText, suggestion);
       } else {
-        // For general suggestions, add a highlighted note
-        const noteText = `[${category} Applied: ${suggestion}]`;
-        const updatedText = editableText + `\n\n<span style="background-color: #20b2aa; color: white; padding: 4px 8px; border-radius: 4px; font-style: italic;">${noteText}</span>`;
-        setEditableText(updatedText);
-        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+        // For general suggestions that don't have specific text to replace
+        const noteText = `[${suggestion}]`;
+        const updatedText = currentText + `<br><span style="background-color: #20b2aa; color: white; padding: 4px 8px; border-radius: 4px; font-style: italic; display: inline-block; margin: 4px 0;">${noteText}</span>`;
         
-        // Update the DOM directly
+        setEditableText(updatedText);
         if (editableParagraphRef.current) {
           editableParagraphRef.current.innerHTML = updatedText;
         }
         
-        // Log the change
-        logChange(category, "General suggestion", suggestion);
+        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+        logChange("General", "suggestion", suggestion);
       }
     }
   };

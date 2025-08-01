@@ -14,7 +14,7 @@
         "runtime": "python3.13",
         "s3_bucket": "zappa-opa399ww4",
         "environment_variables": {
-            "MISTRAL_API_KEY": "YOUR_MISTRAL_API_KEY"
+            "MISTRAL_API_KEY": "emprhvoUjSVxekhAMwiLzSapRVcZjNht"
         }
     },
     "dev_ap_east_1": {

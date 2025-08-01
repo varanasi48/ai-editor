@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import './App.css';
 
 function App() {
@@ -6,7 +6,21 @@ function App() {
   const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
   
   // Version for cache busting
-  const APP_VERSION = "v2.1.0-" + Date.now();
+  const APP_VERSION = "v3.0.0-" + Date.now();
+  
+  // Force title update
+  useEffect(() => {
+    document.title = "ZU-edits";
+    // Update meta tags
+    const metaTitle = document.querySelector('meta[name="title"]');
+    if (metaTitle) metaTitle.setAttribute('content', 'ZU-edits');
+    
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', 'ZU-edits');
+    
+    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    if (twitterTitle) twitterTitle.setAttribute('content', 'ZU-edits');
+  }, []);
   
   const [pdfText, setPdfText] = useState("Upload a PDF or DOCX file to see its content here.");
   const [analysisResults, setAnalysisResults] = useState(null);

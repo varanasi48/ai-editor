@@ -102,54 +102,102 @@ function App() {
     
     const issue = analysisResults.issues_found[issueIndex];
     const parts = issue.split(' → ');
-    if (parts.length === 2) {
-      const errorPart = parts[0];
-      const suggestion = parts[1];
+    if (parts.length !== 2) return;
+    
+    const errorPart = parts[0];
+    const suggestion = parts[1];
+    
+    // Extract the actual text to replace (after the category prefix)
+    const colonIndex = errorPart.indexOf(': ');
+    const originalText = colonIndex > -1 ? errorPart.substring(colonIndex + 2) : errorPart;
+    
+    console.log('=== APPLY SUGGESTION DEBUG ===');
+    console.log('Issue:', issue);
+    console.log('Original text to find:', JSON.stringify(originalText));
+    console.log('Suggestion:', JSON.stringify(suggestion));
+    
+    const currentElement = editableParagraphRef.current;
+    if (!currentElement) {
+      console.error('No editable element found');
+      return;
+    }
+    
+    // Get the current HTML content
+    let currentHTML = currentElement.innerHTML;
+    
+    // First, get just the text content to verify the text exists
+    const textContent = currentElement.textContent || currentElement.innerText || "";
+    console.log('Current text content:', JSON.stringify(textContent));
+    console.log('Text contains original?', textContent.includes(originalText));
+    
+    // If the original text exists in the document
+    if (textContent.includes(originalText)) {
+      // Create highlighted replacement
+      const highlightedReplacement = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.2);" title="Applied correction: ${originalText} → ${suggestion}">${suggestion}</span>`;
       
-      // Extract the actual text to replace (after the category prefix)
-      const colonIndex = errorPart.indexOf(': ');
-      const originalText = colonIndex > -1 ? errorPart.substring(colonIndex + 2) : errorPart;
+      // Method 1: Try direct HTML replacement
+      const escapedOriginal = originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(?<!<[^>]*>)${escapedOriginal}(?![^<]*>)`, 'gi');
       
-      console.log('Trying to replace:', originalText, 'with:', suggestion);
+      let updatedHTML = currentHTML.replace(regex, highlightedReplacement);
       
-      // Get current text from the editable element (use textContent for plain text matching)
-      const currentElement = editableParagraphRef.current;
-      if (!currentElement) return;
-      
-      const currentText = currentElement.textContent || currentElement.innerText || "";
-      const currentHTML = currentElement.innerHTML || "";
-      
-      console.log('Current text contains original?', currentText.includes(originalText));
-      console.log('Original text length:', originalText.length);
-      console.log('Current text length:', currentText.length);
-      console.log('Original text:', JSON.stringify(originalText));
-      console.log('Current text sample:', JSON.stringify(currentText.substring(0, 100)));
-      
-      // Try exact match first
-      if (currentText.includes(originalText)) {
-        const highlightedSuggestion = `<span style="background-color: #20b2aa; color: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;" title="Applied: ${originalText} → ${suggestion}">${suggestion}</span>`;
-        const regex = new RegExp(originalText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        const updatedHTML = currentHTML.replace(regex, highlightedSuggestion);
+      // If that didn't work, try a more aggressive approach
+      if (updatedHTML === currentHTML) {
+        console.log('Direct replacement failed, trying text-based replacement');
         
+        // Split the HTML into text parts and tags
+        const parts = currentHTML.split(/(<[^>]*>)/);
+        let foundAndReplaced = false;
+        
+        for (let i = 0; i < parts.length; i++) {
+          // Only process text parts (not HTML tags)
+          if (!parts[i].startsWith('<') && parts[i].includes(originalText)) {
+            parts[i] = parts[i].replace(new RegExp(escapedOriginal, 'gi'), highlightedReplacement);
+            foundAndReplaced = true;
+            break;
+          }
+        }
+        
+        if (foundAndReplaced) {
+          updatedHTML = parts.join('');
+        }
+      }
+      
+      // Apply the changes
+      if (updatedHTML !== currentHTML) {
+        console.log('Successfully replaced text in document');
         currentElement.innerHTML = updatedHTML;
         setEditableText(updatedHTML);
         
         // Mark as applied
         setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        logChange(errorPart, originalText, suggestion);
-        console.log('Applied suggestion successfully');
-      } else {
-        console.log('Text not found, adding as note');
-        // For suggestions where exact text isn't found, add as a note
-        const noteText = `✓ Applied: ${suggestion}`;
-        const updatedHTML = currentHTML + `<br><span style="background-color: #20b2aa; color: white; padding: 4px 8px; border-radius: 4px; font-style: italic; display: inline-block; margin: 4px 0;">${noteText}</span>`;
         
-        currentElement.innerHTML = updatedHTML;
-        setEditableText(updatedHTML);
-        setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        logChange("Note", "general", suggestion);
+        // Log the change
+        logChange(errorPart, originalText, suggestion);
+        
+        // Force a re-render to ensure the change is visible
+        setRenderKey(prev => prev + 1);
+        
+      } else {
+        console.error('Failed to replace text, falling back to note');
+        addSuggestionAsNote(suggestion, currentHTML, currentElement, issueIndex);
       }
+      
+    } else {
+      console.log('Text not found in document, adding as note');
+      addSuggestionAsNote(suggestion, currentHTML, currentElement, issueIndex);
     }
+  };
+
+  const addSuggestionAsNote = (suggestion, currentHTML, currentElement, issueIndex) => {
+    const noteText = `✓ Applied: ${suggestion}`;
+    const noteHTML = `<br><span style="background-color: #ff9800; color: white; padding: 4px 8px; border-radius: 4px; font-style: italic; display: inline-block; margin: 4px 0; font-size: 12px;">${noteText}</span>`;
+    
+    const updatedHTML = currentHTML + noteHTML;
+    currentElement.innerHTML = updatedHTML;
+    setEditableText(updatedHTML);
+    setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
+    logChange("Note", "manual", suggestion);
   };
 
   const logChange = async (category, originalText, suggestedText) => {

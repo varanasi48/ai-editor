@@ -252,6 +252,19 @@ class FastAPIWSGIAdapter:
             "endless encouragement": "constant encouragement",
             "very big thanks": "heartfelt thanks",
             "would like to place": "I would like to express",
+            "loving and inspiring": "beloved and inspiring",
+            "heartfelt gratitude and respect": "sincere gratitude and respect",
+            "kind guidance and blessings": "gracious guidance and blessings",
+            "love and motivation": "affection and motivation",
+            "much talented and dynamic": "highly talented and dynamic",
+            "acknowledge the love": "recognize the love",
+            "special thanks": "sincere thanks",
+            # Add more specific to the acknowledgment text
+            "through almighty": "through the almighty",
+            "who is there in everything": "who is present in everything",
+            "Role Model": "role model",  # Capitalization
+            "Ex- Deputy": "Ex-Deputy",  # Spacing
+            "Ex-Executive Director": "former Executive Director",
         }
         
         # Check for specific corrections in the text

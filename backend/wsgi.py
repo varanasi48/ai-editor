@@ -116,8 +116,13 @@ class FastAPIWSGIAdapter:
             if not text or len(text.strip()) == 0:
                 return {"error": "Empty text provided"}, 400
             
-            # Use basic analysis for now to avoid AI errors
-            suggestions = self.create_basic_analysis(text)
+            # Try Mistral AI analysis first, fall back to basic if it fails
+            try:
+                suggestions = self.analyze_with_mistral(text)
+                print(f"Mistral analysis successful: {len(suggestions)} suggestions")
+            except Exception as ai_error:
+                print(f"Mistral AI error: {ai_error}, falling back to basic analysis")
+                suggestions = self.create_basic_analysis(text)
             
             # Format suggestions to match frontend expectations  
             issues_found = []
@@ -157,7 +162,163 @@ class FastAPIWSGIAdapter:
                 "original_text": text if 'text' in locals() else ""
             }, 500
 
-    def parse_mistral_suggestions(self, ai_response, original_text):
+    def analyze_with_mistral(self, text):
+        """Use Mistral AI for comprehensive grammar, spelling and style analysis"""
+        import os
+        from mistralai import Mistral
+        
+        # Get API key
+        api_key = os.environ.get("MISTRAL_API_KEY")
+        if not api_key:
+            raise Exception("Mistral API key not found")
+        
+        client = Mistral(api_key=api_key)
+        
+        # Craft a specific prompt for grammar and spelling checking
+        prompt = f"""You are a professional editor and grammar checker. Analyze the following text for:
+1. Grammar mistakes
+2. Spelling errors  
+3. Punctuation issues
+4. Style improvements
+5. Word choice improvements
+6. Professional language suggestions
+
+Text to analyze:
+"{text}"
+
+Please provide specific corrections in this EXACT format:
+CORRECTION: [exact text to replace] → [corrected text]
+EXPLANATION: [brief explanation why]
+TYPE: [grammar/spelling/style/punctuation]
+
+For example:
+CORRECTION: much talented → many talented
+EXPLANATION: "Much" is used with uncountable nouns, "many" with countable nouns like people
+TYPE: grammar
+
+CORRECTION: alot → a lot
+EXPLANATION: "A lot" should be written as two words
+TYPE: spelling
+
+Find ALL issues in the text and provide specific, actionable corrections."""
+
+        try:
+            # Call Mistral API
+            response = client.chat.complete(
+                model="mistral-large-latest",
+                messages=[
+                    {
+                        "role": "user", 
+                        "content": prompt
+                    }
+                ],
+                temperature=0.1,  # Low temperature for consistent corrections
+                max_tokens=1500
+            )
+            
+            ai_response = response.choices[0].message.content
+            print(f"Mistral AI response: {ai_response}")
+            
+            # Parse the structured response
+            return self.parse_mistral_corrections(ai_response, text)
+            
+        except Exception as e:
+            print(f"Mistral API error: {e}")
+            raise e
+
+    def parse_mistral_corrections(self, ai_response, original_text):
+        """Parse Mistral's structured response into suggestions"""
+        suggestions = []
+        lines = ai_response.split('\n')
+        
+        current_correction = {}
+        suggestion_id = 1
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            if line.startswith('CORRECTION:'):
+                # Save previous correction if exists
+                if current_correction.get('original') and current_correction.get('suggestion'):
+                    suggestions.append({
+                        "id": suggestion_id,
+                        "type": current_correction.get('type', 'improvement'),
+                        "original": current_correction['original'],
+                        "suggestion": current_correction['suggestion'],
+                        "explanation": current_correction.get('explanation', 'AI suggested improvement'),
+                        "confidence": 0.9
+                    })
+                    suggestion_id += 1
+                
+                # Parse new correction
+                correction_part = line.replace('CORRECTION:', '').strip()
+                if ' → ' in correction_part:
+                    parts = correction_part.split(' → ')
+                    current_correction = {
+                        'original': parts[0].strip(),
+                        'suggestion': parts[1].strip()
+                    }
+                
+            elif line.startswith('EXPLANATION:'):
+                current_correction['explanation'] = line.replace('EXPLANATION:', '').strip()
+                
+            elif line.startswith('TYPE:'):
+                current_correction['type'] = line.replace('TYPE:', '').strip()
+        
+        # Add final correction
+        if current_correction.get('original') and current_correction.get('suggestion'):
+            suggestions.append({
+                "id": suggestion_id,
+                "type": current_correction.get('type', 'improvement'),
+                "original": current_correction['original'],
+                "suggestion": current_correction['suggestion'],
+                "explanation": current_correction.get('explanation', 'AI suggested improvement'),
+                "confidence": 0.9
+            })
+        
+        # If no structured corrections found, try to extract from free text
+        if not suggestions:
+            suggestions = self.extract_corrections_from_text(ai_response, original_text)
+        
+        return suggestions[:10]  # Limit to 10 suggestions
+
+    def extract_corrections_from_text(self, ai_response, original_text):
+        """Fallback method to extract corrections from unstructured AI response"""
+        suggestions = []
+        
+        # Look for common patterns in AI responses
+        import re
+        
+        # Pattern: "change X to Y" or "replace X with Y"
+        patterns = [
+            r'change "([^"]+)" to "([^"]+)"',
+            r'replace "([^"]+)" with "([^"]+)"',
+            r'"([^"]+)" should be "([^"]+)"',
+            r'correct "([^"]+)" to "([^"]+)"'
+        ]
+        
+        suggestion_id = 1
+        for pattern in patterns:
+            matches = re.finditer(pattern, ai_response, re.IGNORECASE)
+            for match in matches:
+                original = match.group(1)
+                suggestion = match.group(2)
+                
+                # Verify the original text exists in the document
+                if original.lower() in original_text.lower():
+                    suggestions.append({
+                        "id": suggestion_id,
+                        "type": "grammar",
+                        "original": original,
+                        "suggestion": suggestion,
+                        "explanation": f"AI suggested changing '{original}' to '{suggestion}'",
+                        "confidence": 0.8
+                    })
+                    suggestion_id += 1
+        
+        return suggestions
         """Parse Mistral AI response into structured suggestions"""
         suggestions = []
         suggestion_id = 1

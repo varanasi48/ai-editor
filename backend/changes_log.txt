@@ -1,0 +1,464 @@
+
+==========================================
+TIMESTAMP: 2025-08-01T12:23:39.191Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style
+ORIGINAL: "This Book is one place solution to all the needs of professionals and the AD banks for effective management and execution of Foreign Exchange law in India."
+SUGGESTED: "This book is a one-stop solution to all the needs of professionals and AD banks for the effective management and execution of Foreign Exchange law in India."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:23:47.059Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Consistency
+ORIGINAL: "Section 07 deals with all the provisions of appeal, adjudication and compounding under FEMA,1999, late submission fees and Enforcement Directorate"
+SUGGESTED: "Segment 7 deals with all the provisions of appeal, adjudication, and compounding under FEMA, 1999, late submission fees, and the Enforcement Directorate."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:23:52.603Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Legal terminology
+ORIGINAL: "The book deals in great details about Foreign Exchange Management Act, 1999 ('FEMA') being the major law regulating foreign exchange."
+SUGGESTED: "The book deals in great detail with the Foreign Exchange Management Act, 1999 ('FEMA'), which is the major law regulating foreign exchange."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:23:57.057Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Legal terminology
+ORIGINAL: "The book deals in great details about Foreign Exchange Management Act, 1999 ('FEMA') being the major law regulating foreign exchange."
+SUGGESTED: "The book deals in great detail with the Foreign Exchange Management Act, 1999 ('FEMA'), which is the major law regulating foreign exchange."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:24:01.109Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style
+ORIGINAL: "Thanks for your appreciation for the earlier versions of this book and the other books."
+SUGGESTED: "Thank you for your appreciation of the earlier versions of this book and the other books."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:24:23.597Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style
+ORIGINAL: "With so much cross border transactions happening it serves a lot of purpose to have a book which is simplifies the fundamentals and is exhaustive with regard to law and regulations."
+SUGGESTED: "With so many cross-border transactions happening, it serves a great purpose to have a book that simplifies the fundamentals and is exhaustive with regard to laws and regulations."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:38:33.039Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Shri Ashok Kumar Garg, Ex-Executive Director of Bank of Baroda,"
+SUGGESTED: "Shri Ashok Kumar Garg, former Executive Director of Bank of Baroda"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:38:48.321Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Shri Ashok Kumar Garg, Ex-Executive Director of Bank of Baroda,"
+SUGGESTED: "Shri Ashok Kumar Garg, former Executive Director of Bank of Baroda"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:38:50.235Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "for their kind guidance and blessings always."
+SUGGESTED: "for their kind guidance and constant blessings."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:38:54.905Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Would like to place my very big thanks"
+SUGGESTED: "I would like to express my heartfelt thanks"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:39:00.541Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love and motivation of"
+SUGGESTED: "I gratefully acknowledge the love and motivation from"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:39:11.207Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the presence of"
+SUGGESTED: "I gratefully acknowledge the presence of"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:40:14.047Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Would like to place my very big thanks"
+SUGGESTED: "I would like to express my heartfelt thanks"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:40:29.348Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "almighty"
+SUGGESTED: "the Almighty"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:41:01.247Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the presence of"
+SUGGESTED: "I gratefully acknowledge the presence of"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:41:10.787Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Shri Ashok Kumar Garg, Ex-Executive Director of Bank of Baroda,"
+SUGGESTED: "Shri Ashok Kumar Garg, former Executive Director of Bank of Baroda"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:41:13.959Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the presence of"
+SUGGESTED: "I gratefully acknowledge the presence of"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:41:18.093Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Role Model"
+SUGGESTED: "role model"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:42:41.901Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love and motivation of my brothers –"
+SUGGESTED: "I acknowledge the love and motivation from my brothers –"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:42:55.133Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love and motivation of my brothers –"
+SUGGESTED: "I acknowledge the love and motivation from my brothers –"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:42:58.272Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: " Would like to place my heartfelt gratitude and respect to"
+SUGGESTED: "I would like to express my heartfelt gratitude and respect to"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:43:12.822Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge and appreciate the dedication of much talented and dynamic team at Taxpert Professionals in particular"
+SUGGESTED: "I acknowledge and appreciate the dedication of the very talented and dynamic team at Taxpert Professionals, particularly"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:58:04.375Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love and motivation of"
+SUGGESTED: "I acknowledge the love and motivation from"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:58:14.926Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love of"
+SUGGESTED: "I acknowledge the love from"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:58:20.350Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Special thanks to"
+SUGGESTED: "I extend special thanks to"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:58:28.627Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge"
+SUGGESTED: "I acknowledge"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T12:58:33.882Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Spelling
+ORIGINAL: "Smt."
+SUGGESTED: "Smt"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:02:12.123Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Spelling
+ORIGINAL: "Smt."
+SUGGESTED: "Smt"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:02.255Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "through almighty"
+SUGGESTED: "through the Almighty"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:07.366Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Role Model"
+SUGGESTED: "role model"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:13.961Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Would like to place my very big thanks"
+SUGGESTED: "I would like to express my heartfelt thanks"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:19.993Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Shri. J.P Gupta"
+SUGGESTED: "Shri J.P. Gupta"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:23.701Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Mrs. Shyamala Gopinath Madam"
+SUGGESTED: "Mrs. Shyamala Gopinath"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:31.753Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Would like to place my heartfelt gratitude and respect"
+SUGGESTED: "I would like to express my heartfelt gratitude and respect"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:06:50.129Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "for their kind guidance and blessings always"
+SUGGESTED: "for their kind guidance and blessings"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T13:12:45.479Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Acknowledge and appreciate the dedication of much talented and dynamic team"
+SUGGESTED: "I acknowledge and appreciate the dedication of the very talented and dynamic team"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:08:21.682Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Spelling
+ORIGINAL: "Lt."
+SUGGESTED: "Late"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:08:28.148Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Spelling
+ORIGINAL: "Smt."
+SUGGESTED: "Smt"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:08:32.260Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "who is there in everything I do and who remains my Role Model."
+SUGGESTED: "who is present in everything I do and who remains my role model."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:08:35.000Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Would like to place my very big thanks to"
+SUGGESTED: "I would like to express my heartfelt thanks to"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:08:37.362Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Respect to"
+SUGGESTED: "I express my respect to"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:10:38.354Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love of my kids –"
+SUGGESTED: "I acknowledge the love from my kids –"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:10:41.384Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Special thanks to"
+SUGGESTED: "I extend special thanks to"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:11:08.534Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge and appreciate the dedication of much talented and dynamic team at"
+SUGGESTED: "I acknowledge and appreciate the dedication of the very talented and dynamic team at"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:28:36.644Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Spelling
+ORIGINAL: "Smt."
+SUGGESTED: "Smt"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:28:38.108Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "through almighty"
+SUGGESTED: "through the Almighty"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:28:39.324Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Role Model"
+SUGGESTED: "role model"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:29:34.128Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Would like to place my very big thanks"
+SUGGESTED: "I would like to express my heartfelt thanks"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:29:49.384Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "for his continuous guidance, love and support."
+SUGGESTED: "for his continuous guidance, love, and support."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:29:53.318Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Would like to place my heartfelt gratitude and respect"
+SUGGESTED: "I would like to express my heartfelt gratitude and respect"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:30:01.136Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "for their kind guidance and blessings always."
+SUGGESTED: "for their kind guidance and blessings."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:30:02.618Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Dr. Sanjeev Kumar Gupta, Rajeev Kumar Gupta and Praveen Kumar Gupta"
+SUGGESTED: "Dr. Sanjeev Kumar Gupta, Mr. Rajeev Kumar Gupta and Mr. Praveen Kumar Gupta"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:30:03.868Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "CA. Ankit Shah and CA. Shyamli Sharma."
+SUGGESTED: "CA Ankit Shah and CA Shyamli Sharma."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:30:05.390Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Suvidhi Bhushan and Vedansh Bhushan"
+SUGGESTED: "Ms. Suvidhi Bhushan and Mr. Vedansh Bhushan"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:30:06.728Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Grammar
+ORIGINAL: "Special thanks to Taxmann and their Editorial team."
+SUGGESTED: "Special thanks to Taxmann and its Editorial team."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:53:47.890Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love of my kids –"
+SUGGESTED: "I acknowledge the love from my kids –"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:53:49.561Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge and appreciate the dedication of much talented and dynamic team at Taxpert Professionals in particular"
+SUGGESTED: "I acknowledge and appreciate the dedication of the very talented and dynamic team at Taxpert Professionals, particularly"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-01T14:53:50.601Z
+DOCUMENT: 3. Acknowledgement.docx
+CATEGORY: Style
+ORIGINAL: "Acknowledge the love and motivation of my brothers –"
+SUGGESTED: "I acknowledge the love and motivation from my brothers –"
+==========================================

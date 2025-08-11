@@ -7,7 +7,7 @@ const ProjectsManager = ({ username, isVisible, onClose, onSelectDocument }) => 
   const [selectedDocumentLog, setSelectedDocumentLog] = useState(null);
   const [showLogModal, setShowLogModal] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:8000';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   useEffect(() => {
     if (isVisible && username) {

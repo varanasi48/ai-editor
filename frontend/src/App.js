@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import './App.css';
+import Login from './components/Login';
+import Header from './components/Header';
+import LogViewer from './components/LogViewer';
+import PromptBar from './components/PromptBar';
+import ProjectsManager from './components/ProjectsManager';
 
 function App() {
   // Use environment variable for API URL
@@ -8,18 +13,36 @@ function App() {
   // Version for cache busting
   const APP_VERSION = "v3.0.0-" + Date.now();
   
+  // Authentication state
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Check for existing login on app start
+  useEffect(() => {
+    const savedUser = localStorage.getItem('incsyncedits_user');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData.username);
+      } catch (error) {
+        localStorage.removeItem('incsyncedits_user');
+      }
+    }
+    setIsLoading(false);
+  }, []);
+  
   // Force title update
   useEffect(() => {
-    document.title = "ZU-edits";
+    document.title = "insync-edits";
     // Update meta tags
     const metaTitle = document.querySelector('meta[name="title"]');
-    if (metaTitle) metaTitle.setAttribute('content', 'ZU-edits');
+    if (metaTitle) metaTitle.setAttribute('content', 'incsync-edits');
     
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', 'ZU-edits');
+    if (ogTitle) ogTitle.setAttribute('content', 'incsync-edits');
     
     const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-    if (twitterTitle) twitterTitle.setAttribute('content', 'ZU-edits');
+    if (twitterTitle) twitterTitle.setAttribute('content', 'incsync-edits');
   }, []);
   
   const [pdfText, setPdfText] = useState("Upload a PDF or DOCX file to see its content here.");
@@ -29,13 +52,53 @@ function App() {
   const [fileName, setFileName] = useState("");
   const [editableText, setEditableText] = useState("");
   const [showLogModal, setShowLogModal] = useState(false);
-  const [logContent, setLogContent] = useState("");
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
   const [appliedSuggestions, setAppliedSuggestions] = useState(new Set());
-  const [selectedIssue, setSelectedIssue] = useState(null);
-  const [editableAnalysis, setEditableAnalysis] = useState("");
-  const [renderKey, setRenderKey] = useState(0);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+  const [showProjects, setShowProjects] = useState(false);
   const editableParagraphRef = useRef(null);
+
+  // Authentication handlers
+  const handleLogin = (username) => {
+    setUser(username);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('insyncedits_user');
+    setUser(null);
+    // Reset app state
+    setPdfText("Upload a PDF or DOCX file to see its content here.");
+    setAnalysisResults(null);
+    setEditableText("");
+    setHasAnalyzed(false);
+    setAppliedSuggestions(new Set());
+    setFileName("");
+    setChatHistory([]);
+  };
+
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f8f9fa'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '48px', marginBottom: '20px' }}>🤖</div>
+          <div style={{ fontSize: '18px', color: '#6c757d' }}>Loading insync-edits...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated
+  if (!user) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -52,6 +115,7 @@ function App() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("username", user || "anonymous");
 
     try {
       const response = await fetch(`${API_BASE_URL}/upload-pdf`, {
@@ -78,47 +142,297 @@ function App() {
     }
   };
 
-  const handleAnalyze = async () => {
+  const handleSelectDocument = async (project, extractedFile) => {
+    try {
+      // Load the extracted text file using the new API endpoint
+      const response = await fetch(`${API_BASE_URL}/projects/${user}/${project.document_name}/${extractedFile.name}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.content) {
+          setPdfText(data.content);
+          setEditableText(data.content);
+          setFileName(project.document_name);
+          setHasAnalyzed(false);
+          setAnalysisResults(null);
+          setChatHistory([]);
+          console.log(`Document loaded: ${project.document_name}`);
+        } else {
+          throw new Error("No content received");
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error loading document:", error);
+      alert(`Could not load the selected document: ${error.message}`);
+    }
+  };
+
+  const handleAnalyze = async (promptText = customPrompt) => {
     if (!editableText || editableText === "Upload a PDF or DOCX file to see its content here.") {
       alert("Please enter or upload some text to analyze.");
       return;
     }
 
+    // Add user message to chat history
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      content: promptText || "Analyze this document",
+      timestamp: new Date().toLocaleTimeString()
+    };
+    setChatHistory(prev => [...prev, userMessage]);
+
     setLoading(true);
+    
+    // Determine if this is a question/chat or document analysis request
+    const isQuestion = isQuestionPrompt(promptText);
+    const endpoint = isQuestion ? '/chat' : '/analyze';
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      // Extract document name from filename (remove extension)
+      const documentName = fileName ? fileName.replace(/\.[^/.]+$/, "") : "";
+      
+      let requestBody;
+      if (isQuestion) {
+        // For chat/questions, use the chat endpoint
+        requestBody = {
+          text: editableText,
+          question: promptText || "What are the key points in this document?",
+          username: user || "anonymous",
+          document_name: documentName
+        };
+      } else {
+        // For document analysis, use the analyze endpoint
+        requestBody = {
+          text: editableText,
+          custom_prompt: promptText || "",
+          username: user || "anonymous",
+          document_name: documentName
+        };
+      }
+      
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: editableText }),
+        body: JSON.stringify(requestBody),
       });
       
       if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.status}`);
+        throw new Error(`${isQuestion ? 'Chat' : 'Analysis'} failed: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Analysis response:', data);
+      console.log(`${isQuestion ? 'Chat' : 'Analysis'} response:`, data);
       
-      setAnalysisResults(data);
-      setEditableText(data.highlighted_text);
-      setHasAnalyzed(true);
-      setAppliedSuggestions(new Set());
+      if (isQuestion) {
+        // Handle chat response
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          content: data.response || "I'm sorry, I couldn't process your question.",
+          timestamp: new Date().toLocaleTimeString()
+        };
+        setChatHistory(prev => [...prev, aiMessage]);
+      } else {
+        // Handle comprehensive analysis response with context and projections
+        setAnalysisResults(data);
+        setEditableText(data.highlighted_text);
+        setHasAnalyzed(true);
+        setAppliedSuggestions(new Set());
+        
+        // Create comprehensive AI response message  
+        let analysisContent = `${data.colleague_analysis || 'Document Analysis Complete'}\n\n`;
+        
+        // Document Intelligence Summary
+        if (data.document_intelligence) {
+          const intel = data.document_intelligence;
+          if (intel.purpose) {
+            analysisContent += `📄 **Purpose**: ${intel.purpose}\n`;
+          }
+          if (intel.audience) {
+            analysisContent += `👥 **Audience**: ${intel.audience}\n`;
+          }
+          analysisContent += `\n`;
+        }
+        
+        // Appeal Score
+        if (data.appeal_score && data.appeal_score.rating) {
+          analysisContent += `⭐ **Appeal Score**: ${data.appeal_score.rating}\n\n`;
+        }
+        
+        if (data.total_issues > 0) {
+          analysisContent += `🔧 Found ${data.total_issues} improvements:\n\n`;
+          
+          data.issues_found.slice(0, 6).forEach((issue, index) => {
+            const parts = issue.split(' | ');
+            const mainFix = parts[0];
+            const explanation = parts[1] || '';
+            
+            const changePart = mainFix.split(': ')[1] || mainFix;
+            analysisContent += `${index + 1}. **${changePart}**\n`;
+            
+            if (explanation && explanation.length < 80) {
+              analysisContent += `   💡 ${explanation}\n`;
+            }
+            analysisContent += `\n`;
+          });
+          
+          if (data.total_issues > 6) {
+            analysisContent += `... and ${data.total_issues - 6} more in document editor.\n\n`;
+          }
+        }
+        
+        // Contextual insights
+        if (data.contextual_insights && data.contextual_insights.length > 0) {
+          analysisContent += `🔄 **Real-time Suggestions:**\n`;
+          data.contextual_insights.slice(0, 3).forEach(insight => {
+            analysisContent += `${insight}\n`;
+          });
+          analysisContent += `\n`;
+        }
+        
+        // Strategic recommendations
+        if (data.strategic_recommendations && data.strategic_recommendations.length > 0) {
+          analysisContent += `🎯 **Strategic Recommendations:**\n`;
+          data.strategic_recommendations.slice(0, 3).forEach(rec => {
+            const main = rec.split(' | ')[0];
+            analysisContent += `${main}\n`;
+          });
+        }
+        
+        if (data.total_issues > 0) {
+          analysisContent += `� Found ${data.total_issues} specific fixes:\n\n`;
+          
+          // Show first 8 issues with clear action items
+          data.issues_found.slice(0, 8).forEach((issue, index) => {
+            const parts = issue.split(' | ');
+            const mainFix = parts[0]; // "Category: original → suggested"
+            const explanation = parts[1] || '';
+            const tip = parts[2] || '';
+            
+            // Extract the actual change
+            const changePart = mainFix.split(': ')[1] || mainFix;
+            analysisContent += `${index + 1}. ${changePart}\n`;
+            
+            if (explanation && !explanation.includes('Tip:')) {
+              analysisContent += `   💡 ${explanation}\n`;
+            }
+            if (tip) {
+              analysisContent += `   👥 ${tip}\n`;
+            }
+            analysisContent += `\n`;
+          });
+          
+          if (data.total_issues > 8) {
+            analysisContent += `... and ${data.total_issues - 8} more improvements available in the document editor.\n\n`;
+          }
+        }
+        
+        // Add quick wins
+        if (data.actionable_suggestions && data.actionable_suggestions.length > 0) {
+          analysisContent += `⚡ **Quick Wins** (biggest impact):\n`;
+          data.actionable_suggestions.forEach(suggestion => {
+            analysisContent += `${suggestion}\n`;
+          });
+        }
+        
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          content: analysisContent,
+          analysisData: data,
+          timestamp: new Date().toLocaleTimeString()
+        };
+        setChatHistory(prev => [...prev, aiMessage]);
+      }
+      
+      // Update custom prompt if provided via parameter (from PromptBar)
+      if (promptText !== undefined) {
+        setCustomPrompt(promptText);
+      }
       
     } catch (error) {
-      console.error("Error analyzing text:", error);
-      alert(`Error analyzing document: ${error.message}`);
+      console.error(`Error ${isQuestion ? 'getting chat response' : 'analyzing text'}:`, error);
+      
+      // Add error message to chat history
+      const errorMessage = {
+        id: Date.now() + 2,
+        type: 'error',
+        content: `Error ${isQuestion ? 'processing question' : 'analyzing document'}: ${error.message}`,
+        timestamp: new Date().toLocaleTimeString()
+      };
+      setChatHistory(prev => [...prev, errorMessage]);
+      
+      alert(`Error ${isQuestion ? 'processing question' : 'analyzing document'}: ${error.message}`);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to determine if a prompt is a question vs analysis request
+  const isQuestionPrompt = (promptText) => {
+    if (!promptText) return false;
+    
+    const lowerPrompt = promptText.toLowerCase().trim();
+    
+    // Question indicators
+    const questionWords = ['what', 'how', 'why', 'when', 'where', 'who', 'which', 'can', 'could', 'should', 'would', 'is', 'are', 'does', 'do', 'will', 'explain', 'tell me', 'help me understand'];
+    const questionPatterns = [
+      /\?/,  // Contains question mark
+      /^(what|how|why|when|where|who|which|can|could|should|would|is|are|does|do|will)/i,  // Starts with question word
+      /explain|tell me|help me understand|what does.*mean|what is|what are/i  // Explanation requests
+    ];
+    
+    // Analysis indicators (these override question detection)
+    const analysisWords = ['analyze', 'review', 'check', 'find errors', 'find issues', 'correct', 'fix', 'improve', 'suggest', 'focus on', 'look for'];
+    const analysisPatterns = [
+      /analyze|review|check.*error|find.*error|find.*issue|correct|fix|improve|suggest|focus on|look for/i
+    ];
+    
+    // Check if it's clearly an analysis request
+    for (const pattern of analysisPatterns) {
+      if (pattern.test(lowerPrompt)) {
+        return false; // It's an analysis request
+      }
+    }
+    
+    for (const word of analysisWords) {
+      if (lowerPrompt.includes(word)) {
+        return false; // It's an analysis request
+      }
+    }
+    
+    // Check if it's a question
+    for (const pattern of questionPatterns) {
+      if (pattern.test(lowerPrompt)) {
+        return true; // It's a question
+      }
+    }
+    
+    for (const word of questionWords) {
+      if (lowerPrompt.startsWith(word)) {
+        return true; // It's a question
+      }
+    }
+    
+    // Default to analysis if unclear
+    return false;
   };
 
   const handleApplySuggestion = (issueIndex) => {
     if (!analysisResults || !analysisResults.issues_found[issueIndex]) return;
     
     const issue = analysisResults.issues_found[issueIndex];
-    const parts = issue.split(' → ');
+    
+    // Parse the new format: "Category: original → suggested | reason"
+    const mainParts = issue.split(' | ');
+    const issueContent = mainParts[0];
+    const reason = mainParts[1] || '';
+    
+    const parts = issueContent.split(' → ');
     if (parts.length !== 2) return;
     
     const errorPart = parts[0];
@@ -131,6 +445,7 @@ function App() {
     console.log('=== APPLYING SUGGESTION ===');
     console.log('Looking for:', JSON.stringify(originalText));
     console.log('Replace with:', JSON.stringify(suggestion));
+    console.log('Reason:', reason);
     
     const currentElement = editableParagraphRef.current;
     if (!currentElement) return;
@@ -148,7 +463,7 @@ function App() {
       currentElement.innerHTML = newHTML;
       setEditableText(newHTML);
       setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-      logChange(errorPart, originalText, suggestion);
+      logChange(errorPart, originalText, suggestion, reason);
       return;
     }
     
@@ -163,7 +478,7 @@ function App() {
         currentElement.innerHTML = newHTML;
         setEditableText(newHTML);
         setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        logChange(errorPart, originalText, suggestion);
+        logChange(errorPart, originalText, suggestion, reason);
         return;
       }
     }
@@ -192,7 +507,7 @@ function App() {
         currentElement.innerHTML = newHTML;
         setEditableText(newHTML);
         setAppliedSuggestions(prev => new Set([...prev, issueIndex]));
-        logChange(errorPart, originalText, suggestion);
+        logChange(errorPart, originalText, suggestion, reason);
         return;
       }
     }
@@ -204,7 +519,7 @@ function App() {
     alert(`Could not find "${originalText}" in the document. Try re-analyzing the document.`);
   };
 
-  const logChange = async (category, originalText, suggestedText) => {
+  const logChange = async (category, originalText, suggestedText, reason = '') => {
     try {
       await fetch(`${API_BASE_URL}/log-change`, {
         method: "POST",
@@ -216,6 +531,8 @@ function App() {
           original_text: originalText,
           suggested_text: suggestedText,
           document_name: fileName || "untitled",
+          username: user,
+          reason: reason,
           timestamp: new Date().toISOString()
         }),
       });
@@ -225,20 +542,7 @@ function App() {
   };
 
   const handleViewLog = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/get-log`);
-      const data = await response.json();
-      
-      if (data.status === "success") {
-        setLogContent(data.log_content);
-        setShowLogModal(true);
-      } else {
-        alert("Failed to retrieve log: " + data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching log:", error);
-      alert("Error fetching log. Please try again.");
-    }
+    setShowLogModal(true);
   };
 
   return (
@@ -247,51 +551,17 @@ function App() {
       display: 'flex', 
       flexDirection: 'column',
       fontFamily: 'Arial, sans-serif',
-      backgroundColor: '#f8f9fa'
+      backgroundColor: '#f8f9fa',
+      paddingBottom: '120px' // Space for PromptBar
     }}>
       {/* Top Navigation Bar */}
-      <div style={{ 
-        backgroundColor: 'white',
-        borderBottom: '1px solid #dee2e6',
-        padding: '12px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        <h1 style={{ 
-          margin: 0, 
-          fontSize: '24px',
-          fontWeight: 'bold',
-          color: '#333'
-        }}>
-          🤖 ZU-edits
-          <span style={{
-            fontSize: '12px',
-            color: '#6c757d',
-            fontWeight: 'normal',
-            marginLeft: '10px'
-          }}>
-            {APP_VERSION}
-          </span>
-        </h1>
-        <button 
-          onClick={handleViewLog}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            boxShadow: '0 2px 4px rgba(0,123,255,0.2)'
-          }}
-        >
-          📋 View Logs
-        </button>
-      </div>
+      <Header 
+        user={user}
+        onLogout={handleLogout}
+        onViewLog={handleViewLog}
+        onShowProjects={() => setShowProjects(true)}
+        appVersion={APP_VERSION}
+      />
 
       {/* Main Content Grid */}
       <div style={{ 
@@ -304,7 +574,7 @@ function App() {
         minHeight: 0
       }}>
         
-        {/* Left Panel - Original Document */}
+        {/* Left Panel - AI Chat Interface */}
         <div style={{
           backgroundColor: 'white',
           borderRadius: '8px',
@@ -313,15 +583,20 @@ function App() {
           flexDirection: 'column',
           overflow: 'hidden'
         }}>
-          <div style={{ padding: '20px', paddingBottom: '10px' }}>
+          {/* Chat Header */}
+          <div style={{ 
+            padding: '20px', 
+            borderBottom: '1px solid #e9ecef',
+            backgroundColor: '#f8f9fa'
+          }}>
             {/* File Upload Section */}
             <div style={{
-              marginBottom: '20px',
-              padding: '20px',
+              marginBottom: '15px',
+              padding: '15px',
               border: '2px dashed #dee2e6',
               borderRadius: '8px',
               textAlign: 'center',
-              backgroundColor: '#f8f9fa'
+              backgroundColor: 'white'
             }}>
               <input
                 type="file"
@@ -335,102 +610,181 @@ function App() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '8px'
               }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
+                  width: '32px',
+                  height: '32px',
                   backgroundColor: uploading ? '#007bff' : '#6c757d',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '24px',
+                  fontSize: '16px',
                   color: 'white'
                 }}>
                   {uploading ? '⏳' : '📄'}
                 </div>
                 <span style={{
-                  fontSize: '16px',
+                  fontSize: '12px',
                   color: '#495057',
                   fontWeight: '500'
                 }}>
                   {uploading ? "Uploading..." : "Upload PDF/DOCX"}
                 </span>
                 {fileName && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginTop: '5px'
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#007bff',
+                    maxWidth: '150px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                   }}>
-                    <span style={{ fontSize: '20px' }}>📄</span>
-                    <span style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#007bff',
-                      maxWidth: '200px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {fileName}
-                    </span>
-                  </div>
+                    📄 {fileName}
+                  </span>
                 )}
               </label>
             </div>
 
-            {/* Analyze Button */}
-            <div style={{ marginBottom: '20px' }}>
-              <button
-                onClick={handleAnalyze}
-                disabled={loading || pdfText === "Upload a PDF or DOCX file to see its content here."}
-                style={{
-                  width: '100%',
-                  padding: '12px 20px',
-                  backgroundColor: loading ? '#6c757d' : '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  boxShadow: '0 2px 4px rgba(40,167,69,0.2)'
-                }}
-              >
-                {loading ? '🔄 Analyzing...' : '🔍 Analyze Document'}
-              </button>
-            </div>
-
             <h2 style={{
-              fontSize: '18px',
+              fontSize: '16px',
               fontWeight: 'bold',
               color: '#333',
-              marginBottom: '15px',
+              margin: 0,
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
             }}>
-              📄 Original Document
+              💬 AI Assistant Chat
             </h2>
           </div>
           
+          {/* Chat Messages */}
           <div style={{
             flex: 1,
-            margin: '0 20px 20px',
-            padding: '20px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '6px',
-            border: '1px solid #dee2e6',
+            padding: '15px',
             overflow: 'auto',
-            whiteSpace: 'pre-wrap',
-            fontSize: '14px',
-            lineHeight: '1.6',
-            color: '#495057',
-            maxHeight: 'calc(100vh - 300px)'
+            maxHeight: 'calc(100vh - 400px)',
+            backgroundColor: '#fefefe'
           }}>
-            {pdfText}
+            {chatHistory.length === 0 ? (
+              <div style={{
+                textAlign: 'center',
+                color: '#6c757d',
+                fontSize: '14px',
+                marginTop: '40px'
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '10px' }}>🤖</div>
+                <p>Upload a document and start a conversation with AI!</p>
+                <p style={{ fontSize: '12px', marginTop: '10px' }}>
+                  Ask questions, request analysis, or get suggestions for your document.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {chatHistory.map((message) => (
+                  <div
+                    key={message.id}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: message.type === 'user' ? 'flex-end' : 'flex-start'
+                    }}
+                  >
+                    <div style={{
+                      maxWidth: '85%',
+                      padding: '12px 16px',
+                      borderRadius: '18px',
+                      backgroundColor: message.type === 'user' 
+                        ? '#007bff' 
+                        : message.type === 'error' 
+                          ? '#dc3545' 
+                          : '#e9ecef',
+                      color: message.type === 'user' || message.type === 'error' 
+                        ? 'white' 
+                        : '#495057',
+                      fontSize: '14px',
+                      lineHeight: '1.4',
+                      wordBreak: 'break-word'
+                    }}>
+                      <div style={{ marginBottom: '4px' }}>
+                        {message.content}
+                      </div>
+                      
+                      {/* Show analysis summary for AI responses */}
+                      {message.type === 'ai' && message.analysisData && (
+                        <div style={{
+                          marginTop: '10px',
+                          padding: '10px',
+                          backgroundColor: 'rgba(255,255,255,0.9)',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          color: '#495057'
+                        }}>
+                          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                            📊 Analysis Summary:
+                          </div>
+                          <ul style={{ margin: 0, paddingLeft: '15px' }}>
+                            {message.analysisData.issues_found.slice(0, 3).map((issue, idx) => {
+                              const parts = issue.split(' → ');
+                              const errorPart = parts[0] || '';
+                              const categoryMatch = errorPart.match(/^([^:]+):\s*(.+)/);
+                              const category = categoryMatch ? categoryMatch[1] : 'Issue';
+                              return (
+                                <li key={idx} style={{ marginBottom: '3px' }}>
+                                  <strong>{category}:</strong> {categoryMatch ? categoryMatch[2] : errorPart}
+                                </li>
+                              );
+                            })}
+                            {message.analysisData.issues_found.length > 3 && (
+                              <li style={{ color: '#6c757d', fontStyle: 'italic' }}>
+                                ...and {message.analysisData.issues_found.length - 3} more issues
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div style={{
+                      fontSize: '10px',
+                      color: '#6c757d',
+                      marginTop: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      {message.type === 'user' ? '�' : message.type === 'error' ? '❌' : '🤖'}
+                      {message.timestamp}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* Loading indicator */}
+            {loading && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: '#6c757d',
+                fontSize: '14px',
+                marginTop: '15px'
+              }}>
+                <div style={{ 
+                  width: '20px', 
+                  height: '20px',
+                  border: '2px solid #e9ecef',
+                  borderTop: '2px solid #007bff',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+                AI is analyzing your document...
+              </div>
+            )}
           </div>
         </div>
 
@@ -575,7 +929,12 @@ function App() {
                   {analysisResults && analysisResults.total_issues > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {analysisResults.issues_found.map((issue, index) => {
-                        const parts = issue.split(' → ');
+                        // Parse the issue format: "Category: original → suggested | reason"
+                        const mainParts = issue.split(' | ');
+                        const issueContent = mainParts[0];
+                        const reason = mainParts[1] || '';
+                        
+                        const parts = issueContent.split(' → ');
                         const errorPart = parts[0] || '';
                         const suggestionPart = parts[1] || '';
                         
@@ -610,6 +969,8 @@ function App() {
                                   category.toLowerCase().includes('style') ? '#ffc107' :
                                   category.toLowerCase().includes('grammar') ? '#28a745' :
                                   category.toLowerCase().includes('legal') ? '#6f42c1' :
+                                  category.toLowerCase().includes('clarity') ? '#17a2b8' :
+                                  category.toLowerCase().includes('punctuation') ? '#fd7e14' :
                                   '#6c757d',
                                 color: 'white'
                               }}>
@@ -665,6 +1026,36 @@ function App() {
                               </div>
                             )}
                             
+                            {/* Reasoning */}
+                            {reason && (
+                              <div style={{
+                                marginBottom: '12px',
+                                padding: '10px',
+                                backgroundColor: '#f8f9fa',
+                                borderRadius: '6px',
+                                borderLeft: '4px solid #007bff'
+                              }}>
+                                <div style={{
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  color: '#007bff',
+                                  marginBottom: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  💡 Why this change?
+                                </div>
+                                <div style={{
+                                  fontSize: '13px',
+                                  lineHeight: '1.4',
+                                  color: '#495057'
+                                }}>
+                                  {reason}
+                                </div>
+                              </div>
+                            )}
+                            
                             {/* Apply Button */}
                             {!isApplied && (
                               <button
@@ -712,79 +1103,30 @@ function App() {
         </div>
       </div>
 
-      {/* Log Modal */}
-      {showLogModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '24px',
-            maxWidth: '90%',
-            maxHeight: '80%',
-            overflow: 'hidden',
-            minWidth: '600px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              marginBottom: '20px',
-              paddingBottom: '15px',
-              borderBottom: '2px solid #dee2e6'
-            }}>
-              <h2 style={{ 
-                margin: 0,
-                fontSize: '20px',
-                fontWeight: 'bold',
-                color: '#333'
-              }}>
-                📋 Changes Log
-              </h2>
-              <button
-                onClick={() => setShowLogModal(false)}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600'
-                }}
-              >
-                ✕ Close
-              </button>
-            </div>
-            <div style={{
-              backgroundColor: '#f8f9fa',
-              padding: '20px',
-              borderRadius: '6px',
-              border: '1px solid #dee2e6',
-              overflow: 'auto',
-              maxHeight: '500px',
-              fontSize: '13px',
-              fontFamily: 'Consolas, Monaco, monospace',
-              lineHeight: '1.4',
-              color: '#495057'
-            }}>
-              {logContent || "No changes have been logged yet."}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Log Viewer */}
+      <LogViewer
+        isOpen={showLogModal}
+        onClose={() => setShowLogModal(false)}
+        user={user}
+        currentDocument={fileName}
+        apiBaseUrl={API_BASE_URL}
+      />
+
+      {/* Bottom Prompt Bar */}
+      <PromptBar
+        onSendPrompt={handleAnalyze}
+        isAnalyzing={loading}
+        user={user}
+        fileName={fileName}
+      />
+
+      {/* Projects Manager Modal */}
+      <ProjectsManager
+        username={user}
+        isVisible={showProjects}
+        onClose={() => setShowProjects(false)}
+        onSelectDocument={handleSelectDocument}
+      />
     </div>
   );
 }

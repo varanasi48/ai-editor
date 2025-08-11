@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: insync-edits Serverless Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: python3.9
+
+Resources:
+  # S3 Bucket for file storage
+  InsyncEditsStorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-storage"
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ["*"]
+            AllowedMethods: [GET, PUT, POST, DELETE]
+            AllowedOrigins: ["*"]
+            MaxAge: 3000
+
+  # Lambda Function
+  InsyncEditsAPI:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: lambda_handler.handler
+      Environment:
+        Variables:
+          S3_BUCKET_NAME: !Ref InsyncEditsStorage
+          MISTRAL_API_KEY: !Ref MistralApiKey
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: !Ref InsyncEditsStorage
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+
+Parameters:
+  MistralApiKey:
+    Type: String
+    Description: Mistral AI API Key
+    NoEcho: true
+
+Outputs:
+  ApiGatewayEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    
+  S3BucketName:
+    Description: "S3 Bucket for file storage"
+    Value: !Ref InsyncEditsStorage

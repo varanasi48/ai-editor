@@ -1,0 +1,40 @@
+
+==========================================
+TIMESTAMP: 2025-08-05T18:38:06.032Z
+USER: admin
+DOCUMENT: 2. Preface.docx
+CATEGORY: Grammar: In India we have RBI
+ORIGINAL: "In India we have RBI"
+SUGGESTED: "In India, we have the RBI"
+REASON: Adding a comma after 'India' corrects the sentence structure, and including 'the' before 'RBI' is grammatically correct as it refers to a specific entity. This enhances clarity and professionalism.
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T18:38:10.746Z
+USER: admin
+DOCUMENT: 2. Preface.docx
+CATEGORY: Grammar: alongwith Central Government
+ORIGINAL: "alongwith Central Government"
+SUGGESTED: "along with the Central Government"
+REASON: 'Along with' is the correct phrase, and adding 'the' before 'Central Government' specifies the entity being referred to, which is essential for legal precision.
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-06T06:13:31.388Z
+USER: admin
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: Willing to receive your feedback and questions
+ORIGINAL: "Willing to receive your feedback and questions"
+SUGGESTED: "We are willing to receive your feedback and questions"
+REASON: Adding the subject 'We are' makes the sentence grammatically complete and improves its clarity and professional tone.
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-06T07:25:10.407Z
+USER: admin
+DOCUMENT: 2. Preface.docx
+CATEGORY: Clarity: During the current financial year, 2023-24 (up-to September 2023) FDI worth USD 33 billion has been reported.
+ORIGINAL: "During the current financial year, 2023-24 (up-to September 2023) FDI worth USD 33 billion has been reported."
+SUGGESTED: "During the current financial year, 2023-24 (up to September 2023), FDI inflows worth USD 33 billion have been reported."
+REASON: The original sentence lacks clarity and proper punctuation. The suggested text improves readability and correctness.
+==========================================

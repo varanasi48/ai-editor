@@ -1,0 +1,14 @@
+This is a sample contract for review purposes.
+
+AGREEMENT FOR SERVICES
+
+This Agreement is entered into on [DATE] between [PARTY A] and [PARTY B].
+
+1. SCOPE OF WORK
+The contractor agrees to provide the following services...
+
+2. COMPENSATION
+Payment shall be made within 30 days of invoice receipt.
+
+3. TERM
+This agreement shall remain in effect until [END DATE].

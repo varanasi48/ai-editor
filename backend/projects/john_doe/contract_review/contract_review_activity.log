@@ -1,0 +1,4 @@
+[2025-08-06T12:45:00.000000] UPLOAD - Document uploaded: sample_contract.pdf (User: john_doe)
+[2025-08-06T12:47:15.000000] ANALYZE - Document analyzed with prompt: 'Review this document and find specific text that needs fixing. Give me exact replacements for spelling, grammar, legal terminology, and clarity issues.' (User: john_doe)
+[2025-08-06T12:50:30.000000] CHAT - Question asked: 'What are the key obligations mentioned in this contract?' (User: john_doe)
+[2025-08-06T12:52:45.000000] ANALYZE - Document analyzed with prompt: 'Polish this document to professional standards. Fix formatting, tone, and language to make it sound more authoritative and credible.' (User: john_doe)

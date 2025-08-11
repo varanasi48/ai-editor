@@ -1,0 +1,3 @@
+[2025-08-06T12:48:00.000000] UPLOAD - Document uploaded: memo_draft.docx (User: jane_smith)
+[2025-08-06T12:49:20.000000] ANALYZE - Document analyzed with prompt: 'Make this document more legally precise. Find weak language, informal terms, and ambiguous phrases that need stronger legal wording.' (User: jane_smith)
+[2025-08-06T12:51:10.000000] CHAT - Question asked: 'Is this legal analysis complete and accurate?' (User: jane_smith)

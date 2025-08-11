@@ -1,0 +1,13 @@
+{
+    "dev": {
+        "app_function": "simple_main.handler",
+        "aws_region": "ap-south-1",
+        "project_name": "simple-ai-law",
+        "runtime": "python3.9",
+        "s3_bucket": "zappa-deployments-ap-south-1-553967851952",
+        "cors": true,
+        "environment_variables": {
+            "ENVIRONMENT": "dev"
+        }
+    }
+}

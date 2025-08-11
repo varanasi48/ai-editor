@@ -502,3 +502,131 @@ CATEGORY: Style: I would like to
 ORIGINAL: "I would like to"
 SUGGESTED: "This book is dedicated to"
 ==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:21.122Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Grammar: With so much cross border transactions happening it serves a lot of purpose to have a book which is simplifies the fundamentals
+ORIGINAL: "With so much cross border transactions happening it serves a lot of purpose to have a book which is simplifies the fundamentals"
+SUGGESTED: "With so many cross-border transactions happening, it serves a great purpose to have a book that simplifies the fundamentals"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:30.342Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Grammar: The book deals in great details about Foreign Exchange Management Act, 1999
+ORIGINAL: "The book deals in great details about Foreign Exchange Management Act, 1999"
+SUGGESTED: "The book deals in great detail with the Foreign Exchange Management Act, 1999"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:37.791Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: I,e.
+ORIGINAL: "I,e."
+SUGGESTED: "i.e."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:43.991Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Grammar: Segment 2 deals extensively deals with both along with FDI in various type of entities.
+ORIGINAL: "Segment 2 deals extensively deals with both along with FDI in various type of entities."
+SUGGESTED: "Segment 2 deals extensively with both, along with FDI in various types of entities."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:47.424Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: Segment 05 deals with IFSC in detail containing the provisions with regard to IFSC in detail.
+ORIGINAL: "Segment 05 deals with IFSC in detail containing the provisions with regard to IFSC in detail."
+SUGGESTED: "Segment 05 deals with the International Financial Services Centres (IFSC) in detail, containing the provisions related to IFSC."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:51.665Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: Hope this book is useful to you.
+ORIGINAL: "Hope this book is useful to you."
+SUGGESTED: "It is hoped that this book will be useful to you."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:53.192Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: Thanks for your appreciation for the earlier versions of this book and the other books.
+ORIGINAL: "Thanks for your appreciation for the earlier versions of this book and the other books."
+SUGGESTED: "Thank you for your appreciation of the earlier versions of this book and our other books."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:53:56.604Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: Section 07 deals with all the provisions of appeal, adjudication and compounding under FEMA,1999, late submission fees and Enforcement Directorate
+ORIGINAL: "Section 07 deals with all the provisions of appeal, adjudication and compounding under FEMA,1999, late submission fees and Enforcement Directorate"
+SUGGESTED: "Segment 07 deals with all the provisions related to appeal, adjudication, and compounding under FEMA, 1999, late submission fees, and the Enforcement Directorate."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:54:00.970Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: In Europe, the SEPA system and other legislation like PSD2 is used.
+ORIGINAL: "In Europe, the SEPA system and other legislation like PSD2 is used."
+SUGGESTED: "In Europe, the Single Euro Payments Area (SEPA) system and other legislation such as the Payment Services Directive 2 (PSD2) are used."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:54:02.379Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: In Singapore, the MAS oversees cross-border payments.
+ORIGINAL: "In Singapore, the MAS oversees cross-border payments."
+SUGGESTED: "In Singapore, the Monetary Authority of Singapore (MAS) oversees cross-border payments."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:54:10.612Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Spelling: alongwith
+ORIGINAL: "alongwith"
+SUGGESTED: "along with"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T07:54:12.277Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: In India we have RBI.
+ORIGINAL: "In India we have RBI."
+SUGGESTED: "In India, the regulatory authority is the Reserve Bank of India (RBI)."
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T08:07:25.814Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Spelling: alongwith
+ORIGINAL: "alongwith"
+SUGGESTED: "along with"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T08:07:36.017Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Grammar: it serves a lot of purpose
+ORIGINAL: "it serves a lot of purpose"
+SUGGESTED: "it serves many purposes"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T08:07:59.170Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Spelling: delas
+ORIGINAL: "delas"
+SUGGESTED: "deals"
+==========================================
+
+==========================================
+TIMESTAMP: 2025-08-05T08:11:31.399Z
+DOCUMENT: 2. Preface.docx
+CATEGORY: Style: extensively deals
+ORIGINAL: "extensively deals"
+SUGGESTED: "deals extensively"
+==========================================

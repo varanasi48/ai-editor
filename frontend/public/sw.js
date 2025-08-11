@@ -1,14 +1,14 @@
 // Force update service worker
-const CACHE_NAME = 'zu-edits-v3.0.0-' + Date.now();
+const CACHE_NAME = 'insync-edits-v3.0.0-' + Date.now();
 
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Install - ZU-edits');
+  console.log('Service Worker: Install - insync-edits');
   // Skip waiting to activate immediately
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activate - ZU-edits');
+  console.log('Service Worker: Activate - insync-edits');
   // Clean up ALL old caches
   event.waitUntil(
     caches.keys().then((cacheNames) => {
